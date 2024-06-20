@@ -24,7 +24,7 @@ public interface Holder<T> {
 
     T get();
 
-    RegistryKey<Registry<T>> getRegistryKey();
+    RegistryKey<? extends Registry<?>> getRegistryKey();
     ResourceKey getId();
 
     StreamCodec<SimpleByteBuf, Holder<?>> streamCodec();

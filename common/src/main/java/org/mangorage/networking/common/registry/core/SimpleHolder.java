@@ -5,15 +5,15 @@ import org.mangorage.networking.common.util.SimpleByteBuf;
 
 public class SimpleHolder<T> implements Holder<T> {
 
-    static <T> SimpleHolder<T> of(T object, RegistryKey<Registry<T>> registryKey, ResourceKey id) {
+    static <T> SimpleHolder<T> of(T object, RegistryKey<? extends Registry<?>> registryKey, ResourceKey id) {
         return new SimpleHolder<>(object, registryKey, id);
     }
 
     private final T object;
-    private final RegistryKey<Registry<T>> registryKey;
+    private final RegistryKey<? extends Registry<?>> registryKey;
     private final ResourceKey id;
 
-    private SimpleHolder(T object, RegistryKey<Registry<T>> registryKey, ResourceKey id) {
+    private SimpleHolder(T object, RegistryKey<? extends Registry<?>> registryKey, ResourceKey id) {
         this.object = object;
         this.registryKey = registryKey;
         this.id = id;
@@ -25,7 +25,7 @@ public class SimpleHolder<T> implements Holder<T> {
     }
 
     @Override
-    public RegistryKey<Registry<T>> getRegistryKey() {
+    public RegistryKey<? extends Registry<?>> getRegistryKey() {
         return registryKey;
     }
 

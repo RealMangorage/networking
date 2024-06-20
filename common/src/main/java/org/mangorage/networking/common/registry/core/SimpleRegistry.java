@@ -11,7 +11,7 @@ public class SimpleRegistry<T> implements Registry<T> {
     private final RegistryKey<Registry<T>> registryKey;
 
     private final Map<ResourceKey, Holder<? extends T>> registered = new HashMap<>();
-    private final Map<? extends T, ResourceKey> registered_reverse = new HashMap<>();
+    private final Map<T, ResourceKey> registered_reverse = new HashMap<>();
 
     private SimpleRegistry(RegistryKey<Registry<T>> registryKey) {
         this.registryKey = registryKey;
@@ -35,12 +35,11 @@ public class SimpleRegistry<T> implements Registry<T> {
         return registered_reverse.get(object);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <G extends T> Holder<G> register(ResourceKey resourceKey, G object) {
-        Holder<G> holder = (Holder<G>) SimpleHolder.of(object, registryKey, resourceKey);
+        Holder<G> holder = SimpleHolder.of(object, registryKey, resourceKey);
         registered.put(resourceKey, holder);
-        ((Map<G, ResourceKey>) registered_reverse).put(object, resourceKey);
+        registered_reverse.put(object, resourceKey);
         return holder;
     }
 
