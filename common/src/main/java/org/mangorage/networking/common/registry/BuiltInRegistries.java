@@ -9,8 +9,8 @@ public class BuiltInRegistries {
     public static final Registry<Registry<?>> ROOT = SimpleRegistry.of(Registries.ROOT);
     public static final Registry<Block> BLOCKS = createRegistry(Registries.BLOCKS);
 
-    private static <T> Registry<T> createRegistry(RegistryKey<Registry<T>> registryKey) {
-        SimpleRegistry<T> registry = SimpleRegistry.of(registryKey);
+    private static <T, R extends Registry<T>> Registry<T> createRegistry(RegistryKey<R> registryKey) {
+        SimpleRegistry<T, R> registry = SimpleRegistry.of(registryKey);
         ROOT.register(registryKey.registry(), registry);
         return registry;
     }

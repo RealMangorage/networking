@@ -3,31 +3,29 @@ package org.mangorage.networking.common.registry.core;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleRegistry<T> implements Registry<T> {
-    public static <T> SimpleRegistry<T> of(RegistryKey<Registry<T>> key) {
-        return new SimpleRegistry<T>(key);
+public class SimpleRegistry<T, R extends Registry<T>> implements Registry<T> {
+    public static <T, R extends Registry<T>> SimpleRegistry<T, R> of(RegistryKey<R> key) {
+        return new SimpleRegistry<T, R>(key);
     }
 
-    private final RegistryKey<Registry<T>> registryKey;
+    private final RegistryKey<R> registryKey;
 
     private final Map<ResourceKey, Holder<? extends T>> registered = new HashMap<>();
     private final Map<T, ResourceKey> registered_reverse = new HashMap<>();
 
-    private SimpleRegistry(RegistryKey<Registry<T>> registryKey) {
+    private SimpleRegistry(RegistryKey<R> registryKey) {
         this.registryKey = registryKey;
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public <G extends T> G get(ResourceKey resourceKey) {
-        return (G) getHolder(resourceKey).get();
+        return getHolder(resourceKey).getCast();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <G extends T> Holder<G> getHolder(ResourceKey resourceKey) {
-        return (Holder<G>) registered.get(resourceKey);
+        return registered.get(resourceKey).cast();
     }
 
     @Override
@@ -44,7 +42,7 @@ public class SimpleRegistry<T> implements Registry<T> {
     }
 
     @Override
-    public RegistryKey<Registry<T>> getRegistryKey() {
-        return registryKey;
+    public <R2 extends Registry<T>> RegistryKey<R2> getRegistryKey() {
+        return registryKey.cast();
     }
 }

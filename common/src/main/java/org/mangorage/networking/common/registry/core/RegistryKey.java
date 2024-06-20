@@ -15,4 +15,10 @@ public record RegistryKey<T>(ResourceKey registry) {
             return new RegistryKey<>(ResourceKey.STREAM_CODEC.decode(byteBuf));
         }
     };
+
+    @SuppressWarnings("unchecked")
+    public <T2, R extends Registry<T2>> RegistryKey<R> cast() {
+        return (RegistryKey<R>) this;
+    }
+
 }
