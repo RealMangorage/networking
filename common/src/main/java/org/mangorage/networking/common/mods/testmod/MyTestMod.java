@@ -4,7 +4,9 @@ import io.netty.buffer.Unpooled;
 import org.mangorage.networking.common.events.Events;
 import org.mangorage.networking.common.events.registry.RegisterEvent;
 import org.mangorage.networking.common.mod.EntryPoint;
+import org.mangorage.networking.common.registry.BuiltInRegistries;
 import org.mangorage.networking.common.registry.core.Holder;
+import org.mangorage.networking.common.registry.core.Registry;
 import org.mangorage.networking.common.util.SimpleByteBuf;
 
 @EntryPoint
@@ -19,6 +21,11 @@ public class MyTestMod {
     }
 
     public void onFinish(Void v) {
+        SimpleByteBuf buf = new SimpleByteBuf(Unpooled.buffer());
+
+        Registry.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCKS);
+        var result2 = Registry.STREAM_CODEC.decode(buf);
+
         SimpleByteBuf byteBuf = new SimpleByteBuf(Unpooled.buffer());
 
         var myTest = TestModRegistries.CUSTOM_TEST;

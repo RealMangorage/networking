@@ -6,27 +6,23 @@ import org.mangorage.networking.common.registry.BuiltInRegistries;
 import org.mangorage.networking.common.util.SimpleByteBuf;
 
 public interface Holder<T> {
-    StreamCodec<SimpleByteBuf, Holder<?>> STREAM_CODEC = new StreamCodec<>() {
-        @Override
-        public void encode(SimpleByteBuf byteBuf, Holder<?> object) {
-            RegistryKey.STREAM_CODEC.encode(byteBuf, object.getRegistryKey());
-            ResourceKey.STREAM_CODEC.encode(byteBuf, object.getId());
-        }
-
-        @Override
-        public Holder<?> decode(SimpleByteBuf byteBuf) {
-            var registryId = RegistryKey.STREAM_CODEC.decode(byteBuf);
-            var objectId = ResourceKey.STREAM_CODEC.decode(byteBuf);
-
-            Registry<?> registry = BuiltInRegistries.ROOT.get(registryId.location());
-            if (registry == null)
-                throw new CodecException("Unkown Registry %s".formatted(registryId));
-            Holder<?> holder = registry.getHolder(objectId);
-            if (holder == null)
-                throw new CodecException("Unknown Key %s for Registry %s".formatted(objectId, registryId));
-            return holder;
-        }
-    };
+    StreamCodec<SimpleByteBuf, Holder<?>> STREAM_CODEC = StreamCodec.<SimpleByteBuf, Holder<?>>builder()
+            .field(Registry.STREAM_CODEC, h -> {
+                Registry<?> registry = BuiltInRegistries.ROOT.get(h.getRegistryKey().location());
+                if (registry == null)
+                    throw new CodecException("Unknown Registry %s".formatted(h.getRegistryKey()));
+                return registry;
+            })
+            .field(ResourceKey.STREAM_CODEC, Holder::getId)
+            .apply(p -> {
+                Registry<?> registry = p.get();
+                ResourceKey key = p.get();
+                Holder<?> holder = registry.getHolder(key);
+                if (holder == null)
+                    throw new CodecException("Unknown Key %s for Registry %s".formatted(key, registry.getRegistryKey()));
+                return holder;
+            })
+            .build();
 
     @SuppressWarnings("unchecked")
     default <T2> Holder<T2> cast() {

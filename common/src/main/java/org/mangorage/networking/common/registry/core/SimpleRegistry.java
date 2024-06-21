@@ -18,7 +18,6 @@ public class SimpleRegistry<T> implements Registry<T> {
         this.registryKey = registryKey;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <G extends T> G get(ResourceKey resourceKey) {
         Holder<T> holder = getHolder(resourceKey);

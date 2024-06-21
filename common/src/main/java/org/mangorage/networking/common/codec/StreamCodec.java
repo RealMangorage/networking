@@ -140,7 +140,7 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         }
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         var STREAM_CODEC = StreamCodec.builder(MainObject.class)
                 .field(INT, MainObject::getAmount)
                 .field(SubObject.STREAM_CODEC, MainObject::getSubObject)
@@ -151,6 +151,6 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         STREAM_CODEC.encode(byteBuf, new MainObject(10, new SubObject("Place Holder!")));
 
         var result = STREAM_CODEC.decode(byteBuf);
-        var a =1;
+        var a = 1;
     }
 }

@@ -1,10 +1,24 @@
 package org.mangorage.networking.common.registry.core;
 
+import org.mangorage.networking.common.codec.CodecException;
+import org.mangorage.networking.common.codec.StreamCodec;
 import org.mangorage.networking.common.registry.BuiltInRegistries;
+import org.mangorage.networking.common.registry.Registries;
+import org.mangorage.networking.common.util.SimpleByteBuf;
 
 import java.util.Map;
 
 public interface Registry<T> {
+    static final StreamCodec<SimpleByteBuf, Registry<?>> STREAM_CODEC = StreamCodec.<SimpleByteBuf, Registry<?>>builder()
+            .field(RegistryKey.STREAM_CODEC, Registry::getRegistryKey)
+            .apply(p -> {
+                RegistryKey<?> registryKey = p.get();
+                var registry = BuiltInRegistries.ROOT.get(registryKey.location());
+                if (registry == null)
+                    throw new CodecException("Unknown Registry %s".formatted(registryKey));
+                return registry;
+            })
+            .build();
 
 
     <G extends T> G get(ResourceKey resourceKey);
