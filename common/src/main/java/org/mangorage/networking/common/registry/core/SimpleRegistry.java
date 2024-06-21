@@ -18,14 +18,17 @@ public class SimpleRegistry<T> implements Registry<T> {
         this.registryKey = registryKey;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <G extends T> G get(ResourceKey resourceKey) {
-        return getHolder(resourceKey).getCast();
+        Holder<T> holder = getHolder(resourceKey);
+        return holder == null ? null : holder.getCast();
     }
 
     @Override
     public <G extends T> Holder<G> getHolder(ResourceKey resourceKey) {
-        return registered.get(resourceKey).cast();
+        Holder<? extends T> holder = registered.get(resourceKey);
+        return holder == null ? null : holder.cast();
     }
 
     @Override

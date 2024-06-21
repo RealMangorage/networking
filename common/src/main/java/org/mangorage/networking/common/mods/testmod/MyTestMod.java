@@ -15,7 +15,7 @@ public class MyTestMod {
     }
 
     public void onRegister(RegisterEvent event) {
-        event.registerRegistry(TestModRegistries.CUSTOM);
+        //event.registerRegistry(TestModRegistries.CUSTOM);
     }
 
     public void onFinish(Void v) {

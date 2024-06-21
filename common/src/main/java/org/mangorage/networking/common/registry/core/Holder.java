@@ -22,6 +22,7 @@ public interface Holder<T> {
             var objectId = ResourceKey.STREAM_CODEC.decode(byteBuf);
 
             Registry<?> registry = BuiltInRegistries.ROOT.get(registryId.location());
+            if (registry == null) return null;
             return registry.getHolder(objectId);
         }
     };
