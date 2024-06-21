@@ -1,7 +1,5 @@
 package org.mangorage.networking.common.codec;
 
-import org.mangorage.networking.common.util.SimpleByteBuf;
-
-public interface StreamDecoder<B extends SimpleByteBuf, O> {
+public interface StreamDecoder<B, O> {
     O decode(B buf);
 }

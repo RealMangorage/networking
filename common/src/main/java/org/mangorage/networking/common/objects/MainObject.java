@@ -21,7 +21,7 @@ public class MainObject {
     public final int amount;
     public final SubObject subObject;
 
-    public MainObject(int amount, SubObject subObject) {
+    public MainObject(Integer amount, SubObject subObject) {
         this.amount = amount;
         this.subObject = subObject;
     }
