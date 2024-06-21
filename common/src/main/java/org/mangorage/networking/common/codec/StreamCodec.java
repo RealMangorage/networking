@@ -7,15 +7,12 @@ import org.mangorage.networking.common.util.SimpleByteBuf;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.mangorage.networking.common.codec.ByteBufCodecs.INT;
-import static org.mangorage.networking.common.codec.ByteBufCodecs.STRING;
-
 public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B, T> {
 
     static <B extends SimpleByteBuf, T> StreamCodec<B, T> of(StreamEncoder<B, T> encoder, StreamDecoder<B, T> decoder) {
@@ -32,8 +29,12 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         };
     }
 
+    static <B extends SimpleByteBuf, T> Builder<B, T> builder(Class<T> tClass) {
+        return new Builder<>(tClass);
+    }
+
     static <B extends SimpleByteBuf, T> Builder<B, T> builder() {
-        return new Builder<>();
+        return builder(null);
     }
 
     class Builder<B extends SimpleByteBuf, T> {
@@ -42,23 +43,24 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         @Nullable
         private Class<T> tClass;
 
+        private Builder(Class<T> tClass) {
+            this.tClass = tClass;
+        }
+
         public <S> Builder<B, T> field(StreamCodec<B, S> codec, Function<T, S> getter) {
             fieldCodecs.add(new FieldCodec<>(codec, getter));
             return this;
         }
 
+        // Use to get around needing reflections.
         public Builder<B, T> apply(Function<Params, T> constructor) {
             this.constructor = constructor;
             return this;
         }
 
-        public Builder<B, T> apply(Class<T> tClass) {
-            this.tClass = tClass;
-            return this;
-        }
-
         public StreamCodec<B, T> build() {
-            if (tClass != null) {
+            // Use Reflections if we dont have a constructor defined, but a class defined.
+            if (tClass != null && constructor == null) {
                 final Class<T> tClass1 = tClass;
                 this.constructor = p -> {
                     try {
@@ -109,6 +111,7 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         public static class Params {
             private final Object[] object;
             private final Class<?>[] types;
+            private int index = 0;
 
             private Params(Object[] object) {
                 this.object = object;
@@ -122,6 +125,11 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
                 return (T) object[index];
             }
 
+            public <T> T get() {
+                index++;
+                return get(index - 1);
+            }
+
             public Class<?>[] getTypes() {
                 return types;
             }
@@ -133,23 +141,15 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
     }
 
     public static void main(String[] args) {
-        var STREAM_CODEC = StreamCodec.<SimpleByteBuf, MainObject>builder()
+        var STREAM_CODEC = StreamCodec.builder(MainObject.class)
                 .field(INT, MainObject::getAmount)
-                .field(
-                        StreamCodec.<SimpleByteBuf, SubObject>builder()
-                                .field(STRING, SubObject::info)
-                                .apply(SubObject.class)
-                                .build()
-                        ,
-                        MainObject::getSubObject
-                )
-                .apply(MainObject.class)
+                .field(SubObject.STREAM_CODEC, MainObject::getSubObject)
                 .build();
 
 
         SimpleByteBuf byteBuf = new SimpleByteBuf(Unpooled.buffer());
+        STREAM_CODEC.encode(byteBuf, new MainObject(10, new SubObject("Place Holder!")));
 
-        STREAM_CODEC.encode(byteBuf, new MainObject(10, new SubObject("Asshole!")));
         var result = STREAM_CODEC.decode(byteBuf);
         var a =1;
     }
