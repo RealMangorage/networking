@@ -16,4 +16,20 @@ public record ResourceKey(String namespace, String path) {
             return new ResourceKey(byteBuf.readString(), byteBuf.readString());
         }
     };
+
+    public static ResourceKey createWithPath(String path) {
+        return new ResourceKey(
+                Constants.GAME_ID,
+                path
+        );
+    }
+
+    public static ResourceKey createWithNamespaceAndPath(String name, String path) {
+        return new ResourceKey(name, path);
+    }
+
+    @Override
+    public String toString() {
+        return "ResourceKey[%s:%s]".formatted(namespace, path);
+    }
 }

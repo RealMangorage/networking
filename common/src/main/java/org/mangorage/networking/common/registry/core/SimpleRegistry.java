@@ -3,20 +3,20 @@ package org.mangorage.networking.common.registry.core;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleRegistry<T, R extends Registry<T>> implements Registry<T> {
-    public static <T, R extends Registry<T>> SimpleRegistry<T, R> of(RegistryKey<R> key) {
-        return new SimpleRegistry<T, R>(key);
+public class SimpleRegistry<T> implements Registry<T> {
+    public static <T> SimpleRegistry<T> of(RegistryKey<? extends Registry<T>> key) {
+        return new SimpleRegistry<T>(key);
     }
 
-    private final RegistryKey<R> registryKey;
+    private final RegistryKey<? extends Registry<T>> registryKey;
 
     private final Map<ResourceKey, Holder<? extends T>> registered = new HashMap<>();
     private final Map<T, ResourceKey> registered_reverse = new HashMap<>();
+    private boolean frozen = false;
 
-    private SimpleRegistry(RegistryKey<R> registryKey) {
+    private SimpleRegistry(RegistryKey<? extends Registry<T>> registryKey) {
         this.registryKey = registryKey;
     }
-
 
     @Override
     public <G extends T> G get(ResourceKey resourceKey) {
@@ -35,6 +35,10 @@ public class SimpleRegistry<T, R extends Registry<T>> implements Registry<T> {
 
     @Override
     public <G extends T> Holder<G> register(ResourceKey resourceKey, G object) {
+        if (frozen)
+            throw new IllegalStateException("Attempted to register Object with ID %s for Registry %s which is frozen".formatted(resourceKey, getRegistryKey()));
+        //if (registered.containsKey(resourceKey))
+            //throw new IllegalStateException("Attempted to register Object with duplicate ID %s for Registry %s".formatted(resourceKey, getRegistryKey()));
         Holder<G> holder = SimpleHolder.of(object, registryKey, resourceKey);
         registered.put(resourceKey, holder);
         registered_reverse.put(object, resourceKey);
@@ -42,7 +46,17 @@ public class SimpleRegistry<T, R extends Registry<T>> implements Registry<T> {
     }
 
     @Override
-    public <R2 extends Registry<T>> RegistryKey<R2> getRegistryKey() {
-        return registryKey.cast();
+    public RegistryKey<? extends Registry<T>> getRegistryKey() {
+        return registryKey;
+    }
+
+    @Override
+    public void freeze() {
+        this.frozen = true;
+    }
+
+    @Override
+    public Map<ResourceKey, Holder<? extends T>> getEntries() {
+        return Map.copyOf(registered);
     }
 }

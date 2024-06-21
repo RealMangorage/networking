@@ -28,6 +28,7 @@ addDependency('implementation', project('common'), ['server', 'client'])
 addDependency('implementation', 'com.google.code.gson:gson:2.8.8', [])
 addDependency('implementation', 'com.github.Querz:NBT:6.1', [])
 addDependency('implementation', 'io.netty:netty-all:4.1.100.Final', [])
+addDependency('implementation', 'org.reflections:reflections:0.10.2', [])
 
 addDependency('testImplementation', project.dependencies.platform('org.junit:junit-bom:5.10.0'), [])
 addDependency('testImplementation', 'org.junit.jupiter:junit-jupiter', [])
