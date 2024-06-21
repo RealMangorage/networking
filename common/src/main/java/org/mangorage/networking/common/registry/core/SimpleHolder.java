@@ -2,7 +2,6 @@ package org.mangorage.networking.common.registry.core;
 
 import org.mangorage.networking.common.codec.DeferredStream;
 import org.mangorage.networking.common.codec.StreamCodec;
-import org.mangorage.networking.common.codec.StreamCodecConsumer;
 import org.mangorage.networking.common.util.SimpleByteBuf;
 
 public class SimpleHolder<T> implements Holder<T> {
@@ -38,7 +37,7 @@ public class SimpleHolder<T> implements Holder<T> {
     }
 
     @Override
-    public StreamCodecConsumer<SimpleByteBuf, Holder<?>, StreamCodec<SimpleByteBuf, Holder<?>>> streamCodec() {
-        return () -> deferredStream;
+    public StreamCodec<SimpleByteBuf, Holder<?>> streamCodec() {
+        return Holder.STREAM_CODEC;
     }
 }

@@ -15,7 +15,7 @@ public class MyTestMod {
     }
 
     public void onRegister(RegisterEvent event) {
-        //event.registerRegistry(TestModRegistries.CUSTOM);
+        event.registerRegistry(TestModRegistries.CUSTOM);
     }
 
     public void onFinish(Void v) {
@@ -23,7 +23,7 @@ public class MyTestMod {
 
         var myTest = TestModRegistries.CUSTOM_TEST;
 
-        myTest.streamCodec().encode(byteBuf);
+        myTest.encode(byteBuf);
 
         var result = Holder.STREAM_CODEC.decode(byteBuf);
         if (result == null)

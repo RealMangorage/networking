@@ -1,12 +1,9 @@
 package org.mangorage.networking.common.registry.core;
 
-import org.mangorage.networking.common.codec.DeferredStream;
+import org.mangorage.networking.common.codec.CodecException;
 import org.mangorage.networking.common.codec.StreamCodec;
-import org.mangorage.networking.common.codec.StreamCodecConsumer;
 import org.mangorage.networking.common.registry.BuiltInRegistries;
 import org.mangorage.networking.common.util.SimpleByteBuf;
-
-import java.util.function.Consumer;
 
 public interface Holder<T> {
     StreamCodec<SimpleByteBuf, Holder<?>> STREAM_CODEC = new StreamCodec<>() {
@@ -22,8 +19,12 @@ public interface Holder<T> {
             var objectId = ResourceKey.STREAM_CODEC.decode(byteBuf);
 
             Registry<?> registry = BuiltInRegistries.ROOT.get(registryId.location());
-            if (registry == null) return null;
-            return registry.getHolder(objectId);
+            if (registry == null)
+                throw new CodecException("Unkown Registry %s".formatted(registryId));
+            Holder<?> holder = registry.getHolder(objectId);
+            if (holder == null)
+                throw new CodecException("Unknown Key %s for Registry %s".formatted(objectId, registryId));
+            return holder;
         }
     };
 
@@ -42,5 +43,9 @@ public interface Holder<T> {
     RegistryKey<? extends Registry<?>> getRegistryKey();
     ResourceKey getId();
 
-    StreamCodecConsumer<SimpleByteBuf, Holder<?>, StreamCodec<SimpleByteBuf, Holder<?>>> streamCodec();
+    <B extends SimpleByteBuf> StreamCodec<B, Holder<?>> streamCodec();
+
+    default <B extends SimpleByteBuf> void encode(B buf) {
+        streamCodec().encode(buf, this);
+    }
 }

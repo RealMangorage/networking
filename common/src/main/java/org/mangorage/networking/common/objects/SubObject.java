@@ -1,6 +1,5 @@
 package org.mangorage.networking.common.objects;
 
-import io.netty.buffer.ByteBuf;
 import org.mangorage.networking.common.codec.StreamCodec;
 import org.mangorage.networking.common.util.SimpleByteBuf;
 
