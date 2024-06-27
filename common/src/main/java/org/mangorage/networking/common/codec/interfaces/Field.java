@@ -5,7 +5,7 @@ import org.mangorage.networking.common.codec.StreamCodec;
 
 import java.util.function.Function;
 
-record Field<B, M, T>(StreamCodec<B, T> fieldCodec, Function<M, T> mainToField) {
+public record Field<B, M, T>(StreamCodec<B, T> fieldCodec, Function<M, T> mainToField) {
     public T decode(B buf) {
         return fieldCodec.decode(buf);
     }

@@ -1,7 +1,8 @@
-package org.mangorage.networking.common.codec.interfaces;
+package org.mangorage.networking.common.codec.interfaces.builders;
+
+import org.mangorage.networking.common.codec.interfaces.Field;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 class Helper {
