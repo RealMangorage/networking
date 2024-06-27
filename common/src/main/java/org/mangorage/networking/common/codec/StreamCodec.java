@@ -15,6 +15,12 @@ import java.util.stream.Stream;
 import static org.mangorage.networking.common.codec.ByteBufCodecs.INT;
 public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B, T> {
 
+    @SuppressWarnings("unchecked")
+    default <G> StreamCodec<B, G> cast() {
+        return (StreamCodec<B, G>) this;
+    }
+
+
     static <B extends SimpleByteBuf, T> StreamCodec<B, T> of(StreamEncoder<B, T> encoder, StreamDecoder<B, T> decoder) {
         return new StreamCodec<B, T>() {
             @Override
