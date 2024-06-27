@@ -1,4 +1,4 @@
-package org.mangorage.networking.common.codec.interfaces;
+package org.mangorage.networking.common.codec.interfaces.builders;
 
 
 

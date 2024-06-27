@@ -1,7 +1,8 @@
-package org.mangorage.networking.common.codec.interfaces;
+package org.mangorage.networking.common.codec.interfaces.builders;
 
 import org.mangorage.networking.common.codec.StreamCodec;
-import org.mangorage.networking.common.codec.interfaces.functions.Func1;
+import org.mangorage.networking.common.codec.interfaces.Field;
+import org.mangorage.networking.common.codec.interfaces.Helper;
 import org.mangorage.networking.common.codec.interfaces.functions.Func2;
 
 import java.util.List;

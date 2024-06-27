@@ -3,6 +3,7 @@ package org.mangorage.networking.common.codec.interfaces;
 import io.netty.buffer.Unpooled;
 import org.mangorage.networking.common.codec.ByteBufCodecs;
 import org.mangorage.networking.common.codec.StreamCodec;
+import org.mangorage.networking.common.codec.interfaces.builders.Builder;
 import org.mangorage.networking.common.util.SimpleByteBuf;
 
 
