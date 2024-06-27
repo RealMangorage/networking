@@ -1,43 +1,45 @@
 package org.mangorage.networking.common.codec.interfaces.builders;
 
-
 import org.mangorage.networking.common.codec.StreamCodec;
 import org.mangorage.networking.common.codec.interfaces.Field;
 import org.mangorage.networking.common.codec.interfaces.functions.Func1;
-
 import java.util.function.Function;
 
 abstract class Builder1 {
-    public interface Builder<Buf, R, A> {
-        <B> Builder2.Builder<Buf, R, A, B> field(StreamCodec<Buf, B> codec, Function<R, B> getter);
-        StreamCodec<Buf, R> apply(Func1<R, A> function);
+    public interface Builder<Buf, R, T1> {
+        <T2> Builder2.Builder<Buf, R, T1, T2> field(StreamCodec<Buf, T2> codec, Function<R, T2> getter);
+        StreamCodec<Buf, R> apply(Func1<R, T1> function);
     }
 
-    record Impl<Buf, R, A>(
-            Field<Buf, R, A> fieldA
-    ) implements Builder1.Builder<Buf, R, A> {
+    record Impl<Buf, R, T1>(
+        Field<Buf, R, T1> fieldT1
+    ) implements Builder<Buf, R, T1> {
 
-        @Override
-        public <B> Builder2.Builder<Buf, R, A, B> field(StreamCodec<Buf, B> codec, Function<R, B> getter) {
-            return new Builder2.Impl<>(fieldA, new Field<>(codec, getter));
+        public Impl(Field<Buf, R, T1> fieldT1) {
+            this.fieldT1 = fieldT1;
         }
 
         @Override
-        public StreamCodec<Buf, R> apply(Func1<R, A> function) {
+        public <T2> Builder2.Builder<Buf, R, T1, T2> field(StreamCodec<Buf, T2> codec, Function<R, T2> getter) {
+            return new Builder2.Impl<>(fieldT1, new Field<>(codec, getter)
+            );
+        }
+
+        @Override
+        public StreamCodec<Buf, R> apply(Func1<R, T1> function) {
             return new StreamCodec<>() {
                 @Override
                 public R decode(Buf buf) {
                     return function.apply(
-                            fieldA.decode(buf)
+                            fieldT1.decode(buf)
                     );
                 }
 
                 @Override
                 public void encode(Buf buf, R object) {
-                    fieldA.encode(buf, object);
+                    fieldT1.encode(buf, object);
                 }
             };
         }
     }
 }
-

@@ -3,44 +3,47 @@ package org.mangorage.networking.common.codec.interfaces.builders;
 import org.mangorage.networking.common.codec.StreamCodec;
 import org.mangorage.networking.common.codec.interfaces.Field;
 import org.mangorage.networking.common.codec.interfaces.functions.Func2;
-
-import java.util.List;
 import java.util.function.Function;
 
 abstract class Builder2 {
-    public interface Builder<Buf, R, A, B> {
-        <C> Builder3.Builder<Buf, R, A, B, C> field(StreamCodec<Buf, C> codec, Function<R, C> getter);
-        StreamCodec<Buf, R> apply(Func2<R, A, B> function);
+    public interface Builder<Buf, R, T1, T2> {
+        <T3> Builder3.Builder<Buf, R, T1, T2, T3> field(StreamCodec<Buf, T3> codec, Function<R, T3> getter);
+        StreamCodec<Buf, R> apply(Func2<R, T1, T2> function);
     }
 
-    record Impl<Buf, R, A, B>(
-            Field<Buf, R, A> fieldA,
-            Field<Buf, R, B> fieldB
-    ) implements Builder2.Builder<Buf, R, A, B> {
-        @Override
-        public <C> Builder3.Builder<Buf, R, A, B, C> field(StreamCodec<Buf, C> codec, Function<R, C> getter) {
-            return new Builder3.Impl<>(fieldA, fieldB, new Field<>(codec, getter));
+    record Impl<Buf, R, T1, T2>(
+        Field<Buf, R, T1> fieldT1,
+        Field<Buf, R, T2> fieldT2
+    ) implements Builder<Buf, R, T1, T2> {
+
+        public Impl(Field<Buf, R, T1> fieldT1, Field<Buf, R, T2> fieldT2) {
+            this.fieldT1 = fieldT1;
+            this.fieldT2 = fieldT2;
         }
 
         @Override
-        public StreamCodec<Buf, R> apply(Func2<R, A, B> function) {
-            return new StreamCodec<>() {
+        public <T3> Builder3.Builder<Buf, R, T1, T2, T3> field(StreamCodec<Buf, T3> codec, Function<R, T3> getter) {
+            return new Builder3.Impl<>(fieldT1, fieldT2, new Field<>(codec, getter)
+            );
+        }
 
+        @Override
+        public StreamCodec<Buf, R> apply(Func2<R, T1, T2> function) {
+            return new StreamCodec<>() {
                 @Override
                 public R decode(Buf buf) {
                     return function.apply(
-                            fieldA.decode(buf),
-                            fieldB.decode(buf)
+                            fieldT1.decode(buf),
+                            fieldT2.decode(buf)
                     );
                 }
 
                 @Override
                 public void encode(Buf buf, R object) {
-                    fieldA.encode(buf, object);
-                    fieldB.encode(buf, object);
+                    fieldT1.encode(buf, object);
+                    fieldT2.encode(buf, object);
                 }
             };
         }
     }
-
 }
