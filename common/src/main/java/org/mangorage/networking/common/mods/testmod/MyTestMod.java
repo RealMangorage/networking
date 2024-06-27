@@ -26,6 +26,8 @@ public class MyTestMod {
         Registry.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCKS);
         var result2 = Registry.STREAM_CODEC.decode(buf);
 
+        short a = (short) 65535;
+
         SimpleByteBuf byteBuf = new SimpleByteBuf(Unpooled.buffer());
 
         var myTest = TestModRegistries.CUSTOM_TEST;

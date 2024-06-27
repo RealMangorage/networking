@@ -98,7 +98,7 @@ public interface StreamCodec<B, T> extends StreamEncoder<B, T>, StreamDecoder<B,
         }
 
         @SuppressWarnings("unchecked")
-        private static class FieldCodec<B, S, T> {
+        private static class FieldCodec<B extends SimpleByteBuf, S, T> {
             final StreamCodec<B, Object> codec;
             final Function<T, Object> getter;
 
