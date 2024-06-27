@@ -17,10 +17,6 @@ abstract class Builder1 {
             Field<Buf, R, A> fieldA
     ) implements Builder1.Builder<Buf, R, A> {
 
-        public Impl(StreamCodec<Buf, A> codecA, Function<R, A> functionA) {
-            this(new Field<>(codecA, functionA));
-        }
-
         @Override
         public <B> Builder2.Builder<Buf, R, A, B> field(StreamCodec<Buf, B> codec, Function<R, B> getter) {
             return new Builder2.Impl<>(fieldA, new Field<>(codec, getter));
@@ -28,7 +24,7 @@ abstract class Builder1 {
 
         @Override
         public StreamCodec<Buf, R> apply(Func1<R, A> function) {
-            return new StreamCodec<Buf, R>() {
+            return new StreamCodec<>() {
                 @Override
                 public R decode(Buf buf) {
                     return function.apply(

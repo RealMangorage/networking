@@ -4,8 +4,6 @@ import org.mangorage.networking.common.codec.StreamCodec;
 import org.mangorage.networking.common.codec.interfaces.Field;
 import org.mangorage.networking.common.codec.interfaces.functions.Func4;
 
-import java.util.List;
-
 abstract class Builder4 {
     public interface Builder<Buf, R, A, B, C, D> {
         StreamCodec<Buf, R> apply(Func4<R, A, B, C, D> function);
@@ -20,24 +18,24 @@ abstract class Builder4 {
 
         @Override
         public StreamCodec<Buf, R> apply(Func4<R, A, B, C, D> function) {
-            return new StreamCodec<Buf, R>() {
-                private final List<Field<Buf, R, ?>> fields = List.of(fieldA, fieldB, fieldC, fieldD);
+            return new StreamCodec<>() {
 
                 @Override
                 public R decode(Buf buf) {
-                    return Helper.decode(buf, fields, function,
-                            p -> function.apply(
-                                    p.get(),
-                                    p.get(),
-                                    p.get(),
-                                    p.get()
-                            )
+                    return function.apply(
+                            fieldA.decode(buf),
+                            fieldB.decode(buf),
+                            fieldC.decode(buf),
+                            fieldD.decode(buf)
                     );
                 }
 
                 @Override
                 public void encode(Buf buf, R object) {
-                    Helper.encode(buf, object, fields);
+                    fieldA.encode(buf, object);
+                    fieldB.encode(buf, object);
+                    fieldC.encode(buf, object);
+                    fieldD.encode(buf, object);
                 }
             };
         }
